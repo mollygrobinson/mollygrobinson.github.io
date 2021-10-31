@@ -140,8 +140,10 @@ defense20 &lt;- read_csv(&quot;totaldefense20.csv&quot;) %&gt;% mutate(Season = 
 <pre class="r"><code>al &lt;- zscores %&gt;% 
   filter(Name == &quot;Alabama&quot;)</code></pre>
 <pre class="r"><code>ggplot() + 
-  geom_bar(data=zscores, aes(x = reorder(NameYear, -TotalZScore), weight = TotalZScore)) +
-  geom_bar(data=al, aes(x = reorder(NameYear, -TotalZScore), weight = TotalZScore), fill=&quot;#9E1B32&quot;) +
+  geom_bar(data=zscores, aes(x = reorder(NameYear, -TotalZScore), 
+    weight = TotalZScore)) +
+  geom_bar(data=al, aes(x = reorder(NameYear, -TotalZScore), 
+    weight = TotalZScore), fill=&quot;#9E1B32&quot;) +
   labs(x = &quot;SEC Teams&quot;,
     y=&quot;Total Z-Score&quot;, 
     title=&quot;Where Did the Tide Roll?&quot;, 
@@ -160,10 +162,18 @@ defense20 &lt;- read_csv(&quot;totaldefense20.csv&quot;) %&gt;% mutate(Season = 
 <p>The best Bama team? Looks like it’s the 2011 National Championship team. If you don’t remember, in 2011 the Crimson Tide finished their regular 11-1, with their only loss being to LSU. Saban and the Tide later got their revenge, as these two teams met again in New Orleans in the National Title game. Bama came out on top 21-0 to give them the 2011 ’ship win.</p>
 <p>Besides Bama, this graph makes it slightly difficult to keep track of the other SEC teams. So, let’s put them in one line.</p>
 <pre class="r"><code>ggplot() + 
-  geom_bump(data=zscores, aes(x=Season, y=TotalZScore, color=Name)) +
-  geom_point(data=zscores, aes(x=Season, y=TotalZScore, color=Name), size = 4) +
-  geom_text(data = zscores %&gt;% filter(Season == min(zscores$Season)), aes(x = Season - .2, y=TotalZScore, label = Name), size = 3, hjust = 1) +
-  geom_text(data = zscores %&gt;% filter(Season == max(zscores$Season)), aes(x = Season + .2, y=TotalZScore, label = Name), size = 3, hjust = 0) +
+  geom_bump(data=zscores, 
+    aes(x=Season, y=TotalZScore, color=Name)) +
+  geom_point(data=zscores, 
+    aes(x=Season, y=TotalZScore, color=Name), size = 4) +
+  geom_text(data = zscores %&gt;% 
+    filter(Season == min(zscores$Season)), 
+    aes(x = Season - .2, y=TotalZScore, label = Name), 
+    size = 3, hjust = 1) +
+  geom_text(data = zscores %&gt;% 
+    filter(Season == max(zscores$Season)), 
+    aes(x = Season + .2, y=TotalZScore, label = Name), 
+    size = 3, hjust = 0) +
   labs(x = &quot;Season&quot;,
     y=&quot;Total Z-Score&quot;, 
     title=&quot;Bama Z-Scores Stay on Top&quot;, 
@@ -185,8 +195,10 @@ defense20 &lt;- read_csv(&quot;totaldefense20.csv&quot;) %&gt;% mutate(Season = 
 <p>If there’s one thing this bump chart shows us, it’s that Alabama is consistent each year. Again, the only team with a better z-score was Florida in 2009, yet technically Saban’s worst title team STILL managed to beat them. <em>cue Tim Tebow crying, again</em></p>
 <p>Now that we’ve seen the big picture with each of the totals, let’s look at both offense and defense separately.</p>
 <pre class="r"><code>ggplot() + 
-  geom_point(data=zscores, aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;grey&quot;) +
-  geom_point(data=al, aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;#9E1B32&quot;) +
+  geom_point(data=zscores, 
+    aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;grey&quot;) +
+  geom_point(data=al, 
+    aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;#9E1B32&quot;) +
   geom_vline(xintercept = 0) + 
   geom_hline(yintercept = 0) +
   geom_text_repel(
