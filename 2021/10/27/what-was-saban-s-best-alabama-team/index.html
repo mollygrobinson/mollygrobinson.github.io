@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>What was Nick Saban&#39;s best Alabama team? - Molly Robinson&#39;s Blog</title>
+<meta property="og:title" content="What was Nick Saban&#39;s best Alabama team? - Molly Robinson&#39;s Blog">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/mollygrobinson">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/GollyMissMollyR">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">7 min read</span>
+    
+
+    <h1 class="article-title">What was Nick Saban&#39;s best Alabama team?</h1>
+
+    
+    <span class="article-date">2021-10-27</span>
+    
+
+    <div class="article-content">
+      
+<script src="/2021/10/27/what-was-saban-s-best-alabama-team/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>Nick Saban’s dynasty as Alabama head coach includes over 170 wins, 100 plus draft pics, three Heisman winners and eight National Championship appearances, six of which resulted in National Titles.</p>
+<p>Since 2008, Alabama under Saban has seen winning seasons, with 10 wins being their lowest number of wins. Alabama’s 2009, 2011, 2012, 2015, 2017, and 2020 National Championship titles are impressive in this era of college football, but which Saban team is considered the best?</p>
+<pre class="r"><code>library(tidyverse)
+library(ggrepel)
+library(gt)
+library(ggbump)</code></pre>
+<p>First, I gathered the total offensive and defensive data from each year the Crimson Tide won the national title.</p>
+<pre class="r"><code>offense09 &lt;- read_csv(&quot;totaloffense09.csv&quot;) %&gt;% mutate(Season = 2009)
+defense09 &lt;- read_csv(&quot;totaldefense09.csv&quot;) %&gt;% mutate(Season = 2009)
+offense11 &lt;- read_csv(&quot;totaloffense11.csv&quot;) %&gt;% mutate(Season = 2011)
+defense11 &lt;- read_csv(&quot;totaldefense11.csv&quot;) %&gt;% mutate(Season = 2011)
+offense12 &lt;- read_csv(&quot;totaloffense12.csv&quot;) %&gt;% mutate(Season = 2012)
+defense12 &lt;- read_csv(&quot;totaldefense12.csv&quot;) %&gt;% mutate(Season = 2012)
+offense15 &lt;- read_csv(&quot;totaloffense15.csv&quot;) %&gt;% mutate(Season = 2015)
+defense15 &lt;- read_csv(&quot;totaldefense15.csv&quot;) %&gt;% mutate(Season = 2015)
+offense17 &lt;- read_csv(&quot;totaloffense17.csv&quot;) %&gt;% mutate(Season = 2017)
+defense17 &lt;- read_csv(&quot;totaldefense17.csv&quot;) %&gt;% mutate(Season = 2017)
+offense20 &lt;- read_csv(&quot;totaloffense20.csv&quot;) %&gt;% mutate(Season = 2020)
+defense20 &lt;- read_csv(&quot;totaldefense20.csv&quot;) %&gt;% mutate(Season = 2020)</code></pre>
+<p>Now that I have new offensive and defensive data from each year, I’ll bind each years offenses and defenses together in one set. Then, I’ll join the new offensive and defensive data together to have an all around total.</p>
+<pre class="r"><code>offense &lt;- bind_rows(offense09, offense11, offense12, offense15, offense17, offense20 )</code></pre>
+<pre class="r"><code>defense &lt;- bind_rows(defense09, defense11, defense12, defense15, defense17, defense20)</code></pre>
+<pre class="r"><code>totals &lt;- offense %&gt;%
+  left_join(defense, by=c(&quot;Name&quot;, &quot;Season&quot;))</code></pre>
+<p>In my totals, I have EVERY NCAA college football team’s data. However, Kent State won’t really compare to Alabama’s stats, especially when they only played four games in 2020. With that being said, I decided to focus on the SEC alone, mostly because almost all of Alabama’s competition comes from here.</p>
+<pre class="r"><code>sec &lt;- c(&quot;Alabama&quot;, &quot;Auburn&quot;, &quot;Georgia&quot;, &quot;Florida&quot;, &quot;Tennessee&quot;, &quot;Mississippi State&quot;, &quot;Mississippi&quot;, &quot;Arkansas&quot;, &quot;Kentucky&quot;, &quot;Vanderbilt&quot;, &quot;Missouri&quot;, &quot;Texas A&amp;M&quot;, &quot;LSU&quot;, &quot;South Carolina&quot;)</code></pre>
+<p>Now time to prove which Alabama team is statistically the best, and this is where z-scores come into play. In order to find the best Bama team, I’ll calculate each team’s total z-score using offensive yards per game and defensive yards per game.</p>
+<p>Once I have my total offensive and defensive z-scores from yards per game, I can then add them together to get a total for each SEC team from each year Alabama won the title game.</p>
+<pre class="r"><code>zscores &lt;- totals %&gt;% 
+  filter(Name %in% sec) %&gt;% 
+  group_by(Season) %&gt;%
+  mutate(
+  TotalOffZScore = scale(`OffYards/G`, center=TRUE, scale=TRUE),
+  TotalDefZScore = scale(`DefYards/G`, center=TRUE, scale=TRUE) * -1,
+  TotalZScore = TotalOffZScore + (TotalDefZScore), 
+  NameYear = paste(Name, Season, sep = &quot; &quot;))</code></pre>
+<p>One might notice I multiplied the defensive z-scores by -1. This is to make positive defensive z-scores a good thing.</p>
+<pre class="r"><code>zscores %&gt;% 
+  arrange(desc(TotalZScore))</code></pre>
+<pre><code>## # A tibble: 84 × 22
+## # Groups:   Season [6]
+##    Rank.x Name        G.x OffRushYards OffPassYards OffPlays OffTotalYards
+##     &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;
+##  1      6 Florida      14         3105         3305      919          6410
+##  2     31 Alabama      13         2788         2797      865          5585
+##  3      4 Alabama      13         2385         4656      902          7041
+##  4     31 Alabama      14         3185         3052      898          6237
+##  5     29 Alabama      14         3509         2708      944          6217
+##  6     45 Alabama      15         2999         3407     1088          6406
+##  7     43 Alabama      14         3011         2631      947          5642
+##  8     33 Texas A&amp;M    10         2051         2341      678          4392
+##  9     32 Georgia      15         3876         2653      975          6529
+## 10      3 Texas A&amp;M    13         3147         4114     1025          7261
+## # … with 74 more rows, and 15 more variables: OffYards/Play &lt;dbl&gt;,
+## #   OffYards/G &lt;dbl&gt;, Season &lt;dbl&gt;, Rank.y &lt;dbl&gt;, G.y &lt;dbl&gt;,
+## #   DefRushYards &lt;dbl&gt;, DefPassYards &lt;dbl&gt;, DefPlays &lt;dbl&gt;,
+## #   DefTotalYards &lt;dbl&gt;, DefYards/Play &lt;dbl&gt;, DefYards/G &lt;dbl&gt;,
+## #   TotalOffZScore &lt;dbl[,1]&gt;, TotalDefZScore &lt;dbl[,1]&gt;, TotalZScore &lt;dbl[,1]&gt;,
+## #   NameYear &lt;chr&gt;</code></pre>
+<p>Well, Alabama might not be the very top, but all of their National Championship winning teams are in the top 10 of total z-scores. Love them or hate them, it’s impressive all of their teams are in the top 10 and are all right next to each other.</p>
+<p>Let’s take a look at the bigger picture, and look at all of the SEC teams in those years. What does this look like? What team was the best team?</p>
+<pre class="r"><code>al &lt;- zscores %&gt;% 
+  filter(Name == &quot;Alabama&quot;)</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_bar(data=zscores, aes(x = reorder(NameYear, -TotalZScore), weight = TotalZScore)) +
+  geom_bar(data=al, aes(x = reorder(NameYear, -TotalZScore), weight = TotalZScore), fill=&quot;#9E1B32&quot;) +
+  labs(x = &quot;SEC Teams&quot;,
+    y=&quot;Total Z-Score&quot;, 
+    title=&quot;Where Did the Tide Roll?&quot;, 
+    subtitle=&quot;Alabama&#39;s national title teams compared to all SEC teams in the same year.&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) + 
+  theme_minimal() +
+  coord_flip() +
+  theme(
+    plot.title = element_text(size = 24, face = &quot;bold&quot;),
+    axis.title = element_text(size = 13), 
+    plot.subtitle = element_text(size=13), 
+    panel.grid.minor = element_blank()
+  )</code></pre>
+<p><img src="/2021/10/27/what-was-saban-s-best-alabama-team/index_files/figure-html/unnamed-chunk-10-1.png" width="480" /></p>
+<p>Hello, Florida 2009. Based on z-scores, Alabama’s worst team under Saban was his 2009 team, which is also known as the year Alabama beat Florida in the National Title game. <em>cue Tim Tebow crying</em></p>
+<p>The best Bama team? Looks like it’s the 2011 National Championship team. If you don’t remember, in 2011 the Crimson Tide finished their regular 11-1, with their only loss being to LSU. Saban and the Tide later got their revenge, as these two teams met again in New Orleans in the National Title game. Bama came out on top 21-0 to give them the 2011 ’ship win.</p>
+<p>Besides Bama, this graph makes it slightly difficult to keep track of the other SEC teams. So, let’s put them in one line.</p>
+<pre class="r"><code>ggplot() + 
+  geom_bump(data=zscores, aes(x=Season, y=TotalZScore, color=Name)) +
+  geom_point(data=zscores, aes(x=Season, y=TotalZScore, color=Name), size = 4) +
+  geom_text(data = zscores %&gt;% filter(Season == min(zscores$Season)), aes(x = Season - .2, y=TotalZScore, label = Name), size = 3, hjust = 1) +
+  geom_text(data = zscores %&gt;% filter(Season == max(zscores$Season)), aes(x = Season + .2, y=TotalZScore, label = Name), size = 3, hjust = 0) +
+  labs(x = &quot;Season&quot;,
+    y=&quot;Total Z-Score&quot;, 
+    title=&quot;Bama Z-Scores Stay on Top&quot;, 
+    subtitle=&quot;Saban&#39;s Crimson Tide teams stay leaps and bound above the rest&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    panel.grid.major = element_blank(),
+    plot.title = element_text(size = 25, face = &quot;bold&quot;),
+    axis.title = element_text(size = 13), 
+    plot.subtitle = element_text(size=15), 
+    panel.grid.minor = element_blank()
+    ) +
+  scale_color_manual(values = c(&quot;#9E1B32&quot;,&quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;,&quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;, &quot;grey&quot;)) +
+  scale_x_continuous(breaks=c(2009,2011,2012, 2015, 2017, 2020)) + 
+  scale_y_reverse(breaks=c(-3,-2,-1,0,1,2,3))</code></pre>
+<p><img src="/2021/10/27/what-was-saban-s-best-alabama-team/index_files/figure-html/unnamed-chunk-11-1.png" width="480" /></p>
+<p>If there’s one thing this bump chart shows us, it’s that Alabama is consistent each year. Again, the only team with a better z-score was Florida in 2009, yet technically Saban’s worst title team STILL managed to beat them. <em>cue Tim Tebow crying, again</em></p>
+<p>Now that we’ve seen the big picture with each of the totals, let’s look at both offense and defense separately.</p>
+<pre class="r"><code>ggplot() + 
+  geom_point(data=zscores, aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;grey&quot;) +
+  geom_point(data=al, aes(x=TotalOffZScore, y=TotalDefZScore), color=&quot;#9E1B32&quot;) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0) +
+  geom_text_repel(
+    data=al, 
+    aes(x=TotalOffZScore, y=TotalDefZScore, label=NameYear)
+  ) +
+  labs(x = &quot;Total Offensive Z-Score&quot;,
+    y=&quot;Total Defensive Z-Score&quot;, 
+    title=&quot;Surprise! Alabama is at the top!&quot;, 
+    subtitle=&quot;The Tide&#39;s individual z-scores keep them on top of the SEC&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    panel.grid.major = element_blank(),
+    plot.title = element_text(size = 18, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+  )</code></pre>
+<p><img src="/2021/10/27/what-was-saban-s-best-alabama-team/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>The top right corner is where teams want to be, meaning they have good offensive and defensive z-scores. All of Saban’s Alabama teams are where they should be, in that top right corner.</p>
+<p>Earlier, I said Alabama’s 2011 team was the best based on z-scores. Although 2020’s Bama team might have the best offensive z-score, their defense holds the lowest of the Saban squads.</p>
+<p>With this, I would still put 2011 Bama as the top overall Alabama team. They have the highest defensive z-score and the second highest offensive z-score.</p>
+<p>Nick Saban’s Alabama teams have proven themselves to be national powerhouses every year, even when they weren’t always at the very top.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
