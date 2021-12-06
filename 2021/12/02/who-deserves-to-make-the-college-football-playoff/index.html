@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>Who Deserves to make the College Football Playoff? - Molly Robinson&#39;s Blog</title>
+<meta property="og:title" content="Who Deserves to make the College Football Playoff? - Molly Robinson&#39;s Blog">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/mollygrobinson">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/GollyMissMollyR">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">10 min read</span>
+    
+
+    <h1 class="article-title">Who Deserves to make the College Football Playoff?</h1>
+
+    
+    <span class="article-date">2021-12-02</span>
+    
+
+    <div class="article-content">
+      
+<script src="/2021/12/02/who-deserves-to-make-the-college-football-playoff/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>It’s playoff season, which means teams are hopeful to clinch a spot in the College Football Playoff. Since 2014, we’ve seen a four-team playoff for eight years. In the past seven, we’ve seen a lot of the same teams, like Alabama, Clemson, and Ohio State, and occasionally Oklahoma and Notre Dame. However, this year looks slightly different. The undefeated Cincinnati Bearcats are in the playoff conversation, and here’s why they deserve a spot among the nations top Power Five teams.</p>
+<pre class="r"><code>library(tidyverse)
+library(gt)
+library(ggrepel)
+library(ggalt)
+library(ggbump)
+library(lubridate)
+library(ggtext)</code></pre>
+<pre class="r"><code>espnfpi &lt;- read_csv(&quot;espnfpi.csv&quot;)</code></pre>
+<p>To do this, lets look at offensive and defensive stats from 2014 to now (keep in mind, this is all prior to any championship game).</p>
+<pre class="r"><code>offense14 &lt;- read_csv(&quot;totaloffense14.csv&quot;) %&gt;% mutate(Season = 2014)
+defense14 &lt;- read_csv(&quot;totaldefense14.csv&quot;) %&gt;% mutate(Season = 2014)
+offense15 &lt;- read_csv(&quot;totaloffense15.csv&quot;) %&gt;% mutate(Season = 2015)
+defense15 &lt;- read_csv(&quot;totaldefense15.csv&quot;) %&gt;% mutate(Season = 2015)
+offense16 &lt;- read_csv(&quot;totaloffense16.csv&quot;) %&gt;% mutate(Season = 2016)
+defense16 &lt;- read_csv(&quot;totaldefense16.csv&quot;) %&gt;% mutate(Season = 2016)
+offense17 &lt;- read_csv(&quot;totaloffense17.csv&quot;) %&gt;% mutate(Season = 2017)
+defense17 &lt;- read_csv(&quot;totaldefense17.csv&quot;) %&gt;% mutate(Season = 2017)
+offense18 &lt;- read_csv(&quot;totaloffense18.csv&quot;) %&gt;% mutate(Season = 2018)
+defense18 &lt;- read_csv(&quot;totaldefense18.csv&quot;) %&gt;% mutate(Season = 2018)
+offense19 &lt;- read_csv(&quot;totaloffense19.csv&quot;) %&gt;% mutate(Season = 2019)
+defense19 &lt;- read_csv(&quot;totaldefense19.csv&quot;) %&gt;% mutate(Season = 2019)
+offense20 &lt;- read_csv(&quot;totaloffense20.csv&quot;) %&gt;% mutate(Season = 2020)
+defense20 &lt;- read_csv(&quot;totaldefense20.csv&quot;) %&gt;% mutate(Season = 2020)
+offense21 &lt;- read_csv(&quot;totaloffense21.csv&quot;) %&gt;% mutate(Season = 2021)
+defense21 &lt;- read_csv(&quot;totaldefense21.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<p>Now that we have offensive and defensive stats from the playoff era, let’s combine them into their years.</p>
+<pre class="r"><code>all14 &lt;- offense14 %&gt;% 
+  left_join(defense14, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all15 &lt;- offense15 %&gt;% 
+  left_join(defense15, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all16 &lt;- offense16 %&gt;% 
+  left_join(defense16, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all17 &lt;- offense17 %&gt;% 
+  left_join(defense17, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all18 &lt;- offense18 %&gt;% 
+  left_join(defense18, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all19 &lt;- offense19 %&gt;% 
+  left_join(defense19, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all20 &lt;- offense20 %&gt;% 
+  left_join(defense20, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))
+all21 &lt;- offense21 %&gt;% 
+  left_join(defense21, by=c(&quot;Name&quot;, &quot;G&quot;, &quot;Season&quot;))</code></pre>
+<p>I also wanted to look at all of the top six teams we’ve seen since 2014. There’s been a lot of consistent teams, like Alabama, who’s been in the top six every year except for one. Clemson, Oklahoma and Ohio State are even in there quite a bit. Notice Cincinnati is the only Group 5 team on here.</p>
+<pre class="r"><code>topsix21 &lt;- c(&quot;Georgia&quot;, &quot;Michigan&quot;, &quot;Alabama&quot;, &quot;Cincinnati&quot;, &quot;Oklahoma State&quot;, &quot;Notre Dame&quot;)
+topsix20 &lt;- c(&quot;Alabama&quot;, &quot;Clemson&quot;, &quot;Ohio State&quot;, &quot;Notre Dame&quot;, &quot;Texas A&amp;M&quot;, &quot;Oklahoma&quot;)
+topsix19 &lt;- c(&quot;LSU&quot;, &quot;Ohio State&quot;, &quot;Clemson&quot;, &quot;Oklahoma&quot;, &quot;Georgia&quot;, &quot;Oregon&quot;)
+topsix18 &lt;- c(&quot;Alabama&quot;, &quot;Clemson&quot;, &quot;Notre Dame&quot;, &quot;Oklahoma&quot;, &quot;Georgia&quot;, &quot;Ohio State&quot;)
+topsix17 &lt;- c(&quot;Clemson&quot;, &quot;Oklahoma&quot;, &quot;Georgia&quot;, &quot;Alabama&quot;, &quot;Ohio State&quot;, &quot;Wisconsin&quot;)
+topsix16 &lt;- c(&quot;Alabama&quot;, &quot;Clemson&quot;, &quot;Ohio State&quot;, &quot;Washington&quot;, &quot;Penn State&quot;, &quot;Michigan&quot;)
+topsix15 &lt;- c(&quot;Clemson&quot;, &quot;Alabama&quot;, &quot;Michigan State&quot;, &quot;Oklahoma&quot;, &quot;Iowa&quot;, &quot;Standford&quot;)
+topsix14 &lt;- c(&quot;Alabama&quot;, &quot;Oregon&quot;, &quot;Florida State&quot;, &quot;Ohio State&quot;, &quot;Baylor&quot;, &quot;TCU&quot;)</code></pre>
+<pre class="r"><code>alltop6 &lt;- rbind(topsix14, topsix15)
+alltop6 &lt;- rbind(alltop6, topsix16)
+alltop6 &lt;- rbind(alltop6, topsix17)
+alltop6 &lt;- rbind(alltop6, topsix18)
+alltop6 &lt;- rbind(alltop6, topsix19)
+alltop6 &lt;- rbind(alltop6, topsix20)
+alltop6 &lt;- rbind(alltop6, topsix21)</code></pre>
+<pre class="r"><code>all &lt;- bind_rows(all14, all15, all16, all17, all18, all19, all20, all21)</code></pre>
+<p>Next, I made a data frame combining every year, with both offense and defense, and put them all together. I also filtered out the top six from those years.</p>
+<pre class="r"><code>all %&gt;% 
+  filter(Name %in% alltop6) -&gt; topsixeveryyear</code></pre>
+<p>When deciding what makes a top team, a lot more goes into account than just offense and defense. Something I also wanted to look at was each team’s FPI, or ESPN’s football power index. This was developed in 2013 to measure a team’s strength and predict season outcomes. FPI is composed of predicted offensive defensive, and special teams components, and all of this goes into a team’s rating. This rating goes into a team’s net scoring margin against an average FBS opponent.</p>
+<pre class="r"><code>espnfpi %&gt;% 
+  group_by(Team) -&gt; newfpi</code></pre>
+<pre class="r"><code>newfpi &lt;- newfpi %&gt;% 
+  separate(winnloss, into=c(&quot;Wins&quot;, &quot;Losses&quot;)) %&gt;% mutate(Wins = as.numeric(Wins))</code></pre>
+<pre class="r"><code>newfpi %&gt;% 
+  filter(Team %in% topsix21) -&gt; newtopsix</code></pre>
+<p>Here, I gathered the FPI from 2021 (so far), and filtered out the top six teams. Along with FPI, I also wanted to take a look into each team’s chances of making the college football playoff. From ESPN, this is based off of total regular season wins, making the conference championship game and winning their certain conference.</p>
+<pre class="r"><code>ggplot() + 
+  geom_point(
+    data=newfpi, aes(x=FPI, y=playoffpct, size=Wins), color=&quot;black&quot;) +
+  geom_point(
+    data=newtopsix, aes(x=FPI, y=playoffpct, size=Wins), color=&quot;red&quot;) +
+  geom_text_repel(
+    data=newtopsix, 
+    aes(x=FPI, y=playoffpct, label=Team)) +
+  labs(
+    title=&quot;Who Deserves a Spot in the College Football Playoff?&quot;, subtitle=&quot;Cincinnati isn&#39;t too far behind its Power Five foes.&quot;, caption=&quot;Source: ESPN | By Molly Robinson&quot;)  + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="/2021/12/02/who-deserves-to-make-the-college-football-playoff/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>I put the FPI on the x-axis, and playoff percent on the y. As we can see, the top six teams all have high FPI’s and high chances of making the playoff. The size of each team’s dot indicates their number of regular season wins.</p>
+<p>Georgia sits on top in both categories, but close behind in FPI is Alabama. But, who’s that one lone black dot? That’s Ohio State, and they have a 0.1% chance of making the college football playoff this year.</p>
+<p>Cincinnati has high chances and a high FPI. Theirs might not be as high as Notre Dame, Oklahoma State, or even Oklahoma, but this could be due to their competition and their conference itself.</p>
+<pre class="r"><code>all %&gt;% 
+  filter(Name %in% topsix21) -&gt; allteams </code></pre>
+<pre class="r"><code>allteams %&gt;% 
+  mutate(
+    Name = case_when(Name == &quot;Alabama&quot; ~ &quot;Ala.&quot;, Name == &quot;Georgia&quot; ~ &quot;UGA.&quot;, Name == &quot;Cincinnati&quot; ~ &quot;Cincy.&quot;, Name == &quot;Michigan&quot; ~ &quot;Mich.&quot;, Name == &quot;Notre Dame&quot; ~ &quot;ND&quot;, Name == &quot;Oklahoma State&quot; ~ &quot;OK St.&quot;)) -&gt; shortnames</code></pre>
+<p>Now, let’s look at some offensive and defensive stats and see where the Bearcats fall compared to their Power 5 foes.</p>
+<pre class="r"><code>head(shortnames)</code></pre>
+<pre><code>## # A tibble: 6 × 17
+##   Rank.x Name       G OffRushYards OffPassYards OffPlays OffTotalYards
+##    &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;
+## 1      7 Ala.      12         1804         4102      889          5906
+## 2     19 Mich.     12         2699         2715      845          5414
+## 3     27 UGA.      12         2427         2883      752          5310
+## 4     44 Cincy.    12         2133         3043      760          5176
+## 5     56 ND        12         1830         3163      814          4993
+## 6     61 OK St.    12         2289         2604      886          4893
+## # … with 10 more variables: OffYards/Play &lt;dbl&gt;, OffYards/G &lt;dbl&gt;,
+## #   Season &lt;dbl&gt;, Rank.y &lt;dbl&gt;, DefRushYards &lt;dbl&gt;, DefPassYards &lt;dbl&gt;,
+## #   DefPlays &lt;dbl&gt;, DefTotalYards &lt;dbl&gt;, DefYards/Play &lt;dbl&gt;, DefYards/G &lt;dbl&gt;</code></pre>
+<p>Next, I wanted to look at the top six teams past few seasons. Teams like Alabama, Georgia, Notre Dame, and even Michigan are <em>usually</em> consistently strong teams. All of these teams have seen the playoff before too. So, let’s see where Cincinnati falls using a bump chart showing every year.</p>
+<pre class="r"><code>ggplot() + 
+  geom_bump(data=shortnames, 
+    aes(x=Season, y=`OffYards/G`, color=Name)) +
+  geom_point(data=shortnames, 
+    aes(x=Season, y=`OffYards/G`, color=Name), size = 4) +
+  geom_text(data = shortnames %&gt;% 
+    filter(Season == min(Season)), aes(x = Season - .2, y=`OffYards/G`, label = Name), size = 3, hjust = 1) +
+  geom_text(data = shortnames %&gt;%
+    filter(Season == max(Season)), aes(x = Season + .2, y=`OffYards/G`, label = Name), size = 3, hjust = 0) +
+  scale_color_manual(values = c(&quot;#BA0C2F&quot;,&quot;#595959&quot;, &quot;#FFCB05&quot;, &quot;#00843D&quot;, &quot;#FF7300&quot;, &quot;grey&quot;)) +
+  scale_y_reverse() +
+  labs(x = &quot; &quot;,
+    y=&quot;Offensive Yards per Game&quot;, 
+    title=&quot;Offenses Win Games...&quot;, 
+    subtitle=&quot;Cincy might not be Bama, but they stand with the others.&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    panel.grid.major = element_blank(),
+    plot.title = element_text(size = 18, face = &quot;bold&quot;),
+    axis.title = element_text(size = 13), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    ) +
+  scale_x_continuous(breaks=c(2014,2015,2016, 2017, 2018, 2019, 2020, 2021))</code></pre>
+<p><img src="/2021/12/02/who-deserves-to-make-the-college-football-playoff/index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Here’s each teams average offensive yards per game from 2014 until now. Of this top six squad, Cincy is the lowest of the pack in two different years, 2016 and 2019, and are pretty low with Michigan in 2017. Of course Alabama is on top of the bunch this year, but Cincy isn’t too far behind Michigan and Georgia.</p>
+<p>What about defense?</p>
+<pre class="r"><code>ggplot() + 
+  geom_bump(data=shortnames, 
+    aes(x=Season, y=`DefYards/G`, color=Name)) +
+  geom_point(data=shortnames, 
+    aes(x=Season, y=`DefYards/G`, color=Name), size = 4) +
+  geom_text(data = shortnames %&gt;% 
+    filter(Season == min(Season)), aes(x = Season - .2, y=`DefYards/G`, label = Name), size = 3, hjust = 1) +
+  geom_text(data = shortnames %&gt;%
+    filter(Season == max(Season)), aes(x = Season + .2, y=`DefYards/G`, label = Name), size = 3, hjust = 0) +
+  scale_color_manual(values = c(&quot;#BA0C2F&quot;,&quot;#595959&quot;, &quot;#FFCB05&quot;, &quot;#00843D&quot;, &quot;#FF7300&quot;, &quot;grey&quot;)) +
+  scale_y_reverse() +
+  labs(x = &quot; &quot;,
+    y=&quot;Defensive Yards per Game&quot;, 
+    title=&quot;...But Defenses Win Championships&quot;, 
+    subtitle=&quot;This time, they might not be Georgia, but they&#39;re still in with the rest of the pack&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    panel.grid.major = element_blank(),
+    plot.title = element_text(size = 18, face = &quot;bold&quot;),
+    axis.title = element_text(size = 13), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    ) +
+  scale_x_continuous(breaks=c(2014,2015,2016, 2017, 2018, 2019, 2020, 2021))</code></pre>
+<p><img src="/2021/12/02/who-deserves-to-make-the-college-football-playoff/index_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>On defense, the Bearcats are fourth this year, right behind Georgia, Oklahoma State and Alabama. Other than 2015 through 2017, Cincinnati’s defensive yards stay low.</p>
+<p>Now that we’ve seen per game, let’s take a look at average yards per play.</p>
+<p>I focused on the top six teams again and took into account their offensive and defensive yards per play.</p>
+<pre class="r"><code>topsixeveryyear %&gt;% 
+  group_by(Name, Season) %&gt;% 
+  summarise(
+    TotalOffPlayYards = sum(`OffYards/Play`),
+    TotalDefPlayYards = sum(`DefYards/Play`)) %&gt;% 
+  filter(Season == &quot;2021&quot;) -&gt; yards</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;Name&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Since I want to take a look at 2021, I filtered out this year.</p>
+<pre class="r"><code>yards %&gt;% 
+  pivot_longer(
+    cols=starts_with(&quot;Season&quot;), 
+    names_to=&quot;Type&quot;, 
+    values_to=&quot;Yards&quot;)</code></pre>
+<pre><code>## # A tibble: 20 × 5
+## # Groups:   Name [20]
+##    Name           TotalOffPlayYards TotalDefPlayYards Type   Yards
+##    &lt;chr&gt;                      &lt;dbl&gt;             &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+##  1 Alabama                     6.64              4.62 Season  2021
+##  2 Baylor                      6.53              5.47 Season  2021
+##  3 Cincinnati                  6.81              4.29 Season  2021
+##  4 Clemson                     5.25              4.44 Season  2021
+##  5 Florida State               5.79              5.19 Season  2021
+##  6 Georgia                     7.06              3.67 Season  2021
+##  7 Iowa                        4.6               4.52 Season  2021
+##  8 LSU                         5.34              5.39 Season  2021
+##  9 Michigan                    6.41              4.78 Season  2021
+## 10 Michigan State              6.51              5.63 Season  2021
+## 11 Notre Dame                  6.13              5.14 Season  2021
+## 12 Ohio State                  7.78              5.21 Season  2021
+## 13 Oklahoma                    6.77              5.63 Season  2021
+## 14 Oklahoma State              5.52              4.44 Season  2021
+## 15 Oregon                      6.36              5.22 Season  2021
+## 16 Penn State                  5.32              4.67 Season  2021
+## 17 TCU                         6.68              7.21 Season  2021
+## 18 Texas A&amp;M                   5.96              4.66 Season  2021
+## 19 Washington                  4.98              5.02 Season  2021
+## 20 Wisconsin                   5.6               4.1  Season  2021</code></pre>
+<p>Here is both offensive yards and defensive yards per play, but it’s hard to follow. With that being said, I put it in a stacked bar chart for an easier read.</p>
+<pre class="r"><code>yards %&gt;% 
+  pivot_longer(
+    cols=starts_with(&quot;Total&quot;), 
+    names_to=&quot;Type&quot;, 
+    values_to=&quot;Yards&quot;) -&gt; newyards</code></pre>
+<p>In my data set, I decided to filter out both Cincinnati and Georgia. Georgia has had a stout offense and defense this year, so I wanted to compare where the Bearcats stand next to the Bulldogs.</p>
+<pre class="r"><code>newyards %&gt;% 
+  filter(Name == &quot;Cincinnati&quot;) -&gt; cincy</code></pre>
+<pre class="r"><code>newyards %&gt;% 
+  filter(Name == &quot;Georgia&quot;) -&gt; dawgs</code></pre>
+<p>This particular set not only has the top six teams from this season, but <em>all</em> of the top six teams we’ve seen in the playoff era. I did this to see how teams have changed over time, and where they stand now.</p>
+<pre class="r"><code>ggplot() + 
+  geom_bar(
+    data=newyards, aes(x=reorder(Name, Yards), weight=Yards, fill=Type)) +
+  geom_bar(
+    data=cincy, aes(x=reorder(Name, Yards), weight=Yards, fill=Type, color=Type)) +
+  geom_bar(
+    data=dawgs, aes(x=reorder(Name, Yards), weight=Yards, fill=Type, color=Type)) +
+  coord_flip() + 
+  scale_fill_manual(values=c(&quot;light grey&quot;, &quot;dark grey&quot;)) +
+  scale_color_manual(values=c(&quot;#E00122&quot;, &quot;black&quot;)) + 
+  labs(x = &quot; &quot;,
+    y=&quot;Yards Per Play&quot;, 
+    title=&quot;The Bearcats versus The Bulldogs&quot;, 
+    subtitle=&quot;Offense is &lt;span style = &#39;color:black;&#39;&gt;*black*&lt;/span&gt; and defense is &lt;span style = &#39;color:#E00122;&#39;&gt;*red*.&lt;/span&gt;&quot;,
+    caption=&quot;Source: CFB Reference | By Molly Robinson&quot;) +
+  theme_minimal() +
+  theme(
+    legend.position = &quot;none&quot;,
+    panel.grid.major = element_blank(),
+    plot.title = element_text(size = 18, face = &quot;bold&quot;),
+    axis.title = element_text(size = 13), 
+    plot.subtitle = element_markdown(size=10), 
+    panel.grid.minor = element_blank())</code></pre>
+<p><img src="/2021/12/02/who-deserves-to-make-the-college-football-playoff/index_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>Pretty dang close. To get picky, Cincinatti’s total offensive yards per play is at 6.81 yards, whereas Georgia’s stands at 7.06. On the other side of the ball, Cincy features 4.29 defensive yards per play, which isn’t too far from Georgia’s 3.67. Yes, the Dawgs have slightly better stats, but the SEC is also a lot different from the AAC. But keep this in mind, Georgia played four top-25 ranked teams in the regular season. Their other competition was other SEC schools, like South Carolina, Vanderbilt, Mizzou, and Tennessee, not exactly the conference’s <em>best</em> teams.</p>
+<p>With this all being said, I do think Cincinnati deserves a spot in the college football playoff this year. They do seem to compare to some of the big dogs of the Power Five. <em>Somewhere… 2017 Scott Frost is highly disappointed…</em></p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
