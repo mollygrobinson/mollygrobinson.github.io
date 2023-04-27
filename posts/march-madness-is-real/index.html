@@ -1204,36 +1204,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(team_short_display_name) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(game_date <span class="sc">==</span> <span class="fu">max</span>(game_date) <span class="sc">&amp;</span> season <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>team_result, <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"opponent"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(southround1games)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Joining with `by = join_by(team_short_display_name)`</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>southround1games <span class="ot">&lt;-</span> modelgames <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(opponent_short_display_name) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(game_date <span class="sc">==</span> <span class="fu">max</span>(game_date) <span class="sc">&amp;</span> season <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>team_result, <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"team"</span>), <span class="sc">-</span>game_id, <span class="sc">-</span>game_date, <span class="sc">-</span>season) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(southround1games) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Joining with `by = join_by(opponent_short_display_name)`</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>southround1 <span class="ot">&lt;-</span> lightgbm_fit <span class="sc">%&gt;%</span> <span class="fu">predict</span>(<span class="at">new_data =</span> southround1games) <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(southround1games) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.pred_class, team_short_display_name, opponent_short_display_name, <span class="fu">everything</span>())</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>southround1 <span class="ot">&lt;-</span> lightgbm_fit <span class="sc">%&gt;%</span> <span class="fu">predict</span>(<span class="at">new_data =</span> southround1games, <span class="at">type=</span><span class="st">"prob"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(southround1) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.pred_class, .pred_W, .pred_L, team_short_display_name, opponent_short_display_name, <span class="fu">everything</span>())</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>southround1 <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(southround1games)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>southround1games <span class="ot">&lt;-</span> modelgames <span class="sc">%&gt;%</span> </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(opponent_short_display_name) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(game_date <span class="sc">==</span> <span class="fu">max</span>(game_date) <span class="sc">&amp;</span> season <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>team_result, <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"team"</span>), <span class="sc">-</span>game_id, <span class="sc">-</span>game_date, <span class="sc">-</span>season) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(southround1games) </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>southround1 <span class="ot">&lt;-</span> lightgbm_fit <span class="sc">%&gt;%</span> <span class="fu">predict</span>(<span class="at">new_data =</span> southround1games) <span class="sc">%&gt;%</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(southround1games) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.pred_class, team_short_display_name, opponent_short_display_name, <span class="fu">everything</span>())</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>southround1 <span class="ot">&lt;-</span> lightgbm_fit <span class="sc">%&gt;%</span> <span class="fu">predict</span>(<span class="at">new_data =</span> southround1games, <span class="at">type=</span><span class="st">"prob"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(southround1) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(.pred_class, .pred_W, .pred_L, team_short_display_name, opponent_short_display_name, <span class="fu">everything</span>())</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>southround1 <span class="sc">%&gt;%</span> <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Who makes it out of the first round alive??"</span>,</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Some of my predictions were great, others were not so great."</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span>  </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**By:** Molly Robinson  |  **Source:** [hoopr](https://hoopr.sportsdataverse.org/reference/index.html)"</span>)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">weight =</span> <span class="st">"bold"</span>, <span class="at">align =</span> <span class="st">"left"</span>),</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_title</span>(<span class="st">"title"</span>)</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">cell_text</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">align =</span> <span class="st">"left"</span>),</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_title</span>(<span class="st">"subtitle"</span>)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>     <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>()),</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>     <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>       <span class="fu">cell_borders</span>(<span class="at">sides =</span> <span class="st">"bottom"</span>, <span class="at">weight =</span> <span class="fu">px</span>(<span class="dv">3</span>)),</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>       <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>, <span class="at">size=</span><span class="dv">12</span>)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>     )</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>   ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_row_striping</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_table_lines</span>(<span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 
@@ -1262,16 +1279,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   color: #333333;
   font-size: 16px;
   font-weight: normal;
-  font-style: normal;
+  font-style: none;
   background-color: #FFFFFF;
   width: auto;
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
   border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
   border-left-style: none;
@@ -1321,16 +1338,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 
 #itaaimegsg .gt_bottom_border {
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
 #itaaimegsg .gt_col_headings {
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
@@ -1382,7 +1399,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 
 #itaaimegsg .gt_column_spanner {
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   vertical-align: bottom;
@@ -1407,10 +1424,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   border-left-style: none;
@@ -1429,10 +1446,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: initial;
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
@@ -1452,7 +1469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-left: 5px;
   padding-right: 5px;
   margin: 10px;
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 1px;
   border-top-color: #D3D3D3;
   border-left-style: none;
@@ -1471,7 +1488,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: solid;
+  border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
   padding-left: 5px;
@@ -1484,7 +1501,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
-  border-right-style: solid;
+  border-right-style: none;
   border-right-width: 2px;
   border-right-color: #D3D3D3;
   padding-left: 5px;
@@ -1511,7 +1528,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 
 #itaaimegsg .gt_first_summary_row {
-  border-top-style: solid;
+  border-top-style: none;
   border-top-color: #D3D3D3;
 }
 
@@ -1524,7 +1541,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
@@ -1544,7 +1561,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
-  border-top-style: double;
+  border-top-style: none;
   border-top-width: 6px;
   border-top-color: #D3D3D3;
 }
@@ -1554,7 +1571,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
-  border-bottom-style: double;
+  border-bottom-style: none;
   border-bottom-width: 6px;
   border-bottom-color: #D3D3D3;
 }
@@ -1564,10 +1581,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 
 #itaaimegsg .gt_table_body {
-  border-top-style: solid;
+  border-top-style: none;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
-  border-bottom-style: solid;
+  border-bottom-style: none;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
@@ -1679,24 +1696,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
   <thead>
-    
+    <tr class="gt_heading">
+      <td colspan="16" class="gt_heading gt_title gt_font_normal" style="color: #000000; text-align: left; font-weight: bold;">Who makes it out of the first round alive??</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="16" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="color: #000000; text-align: left;">Some of my predictions were great, others were not so great.</td>
+    </tr>
     <tr class="gt_col_headings">
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id=".pred_class">.pred_class</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id=".pred_W">.pred_W</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id=".pred_L">.pred_L</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="team_short_display_name">team_short_display_name</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="opponent_short_display_name">opponent_short_display_name</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="opponent_rolling_def">opponent_rolling_def</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="opponent_rolling_offmean">opponent_rolling_offmean</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="opponent_cumulative_def">opponent_cumulative_def</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="opponent_rolling_pos">opponent_rolling_pos</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="game_id">game_id</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="game_date">game_date</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="season">season</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="team_rolling_def">team_rolling_def</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="team_rolling_offmean">team_rolling_offmean</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="team_cumulative_def">team_cumulative_def</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="team_rolling_pos">team_rolling_pos</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id=".pred_class">.pred_class</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id=".pred_W">.pred_W</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id=".pred_L">.pred_L</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="team_short_display_name">team_short_display_name</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="opponent_short_display_name">opponent_short_display_name</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="opponent_rolling_def">opponent_rolling_def</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="opponent_rolling_offmean">opponent_rolling_offmean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="opponent_cumulative_def">opponent_cumulative_def</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="opponent_rolling_pos">opponent_rolling_pos</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="game_id">game_id</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="game_date">game_date</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="season">season</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="team_rolling_def">team_rolling_def</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="team_rolling_offmean">team_rolling_offmean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="team_cumulative_def">team_cumulative_def</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 3px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;" scope="col" id="team_rolling_pos">team_rolling_pos</th>
     </tr>
   </thead>
   <tbody class="gt_table_body">
@@ -1716,22 +1738,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td headers="team_rolling_offmean" class="gt_row gt_right">NA</td>
 <td headers="team_cumulative_def" class="gt_row gt_right">NA</td>
 <td headers="team_rolling_pos" class="gt_row gt_right">NA</td></tr>
-    <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
-<td headers=".pred_W" class="gt_row gt_right">0.7215527</td>
-<td headers=".pred_L" class="gt_row gt_right">0.2784473</td>
-<td headers="team_short_display_name" class="gt_row gt_left">Alabama</td>
-<td headers="opponent_short_display_name" class="gt_row gt_left">Texas A&amp;M-CC</td>
-<td headers="opponent_rolling_def" class="gt_row gt_right">103.42589</td>
-<td headers="opponent_rolling_offmean" class="gt_row gt_right">102.4858</td>
-<td headers="opponent_cumulative_def" class="gt_row gt_right">101.45245</td>
-<td headers="opponent_rolling_pos" class="gt_row gt_right">69.57647</td>
-<td headers="game_id" class="gt_row gt_right">401522197</td>
-<td headers="game_date" class="gt_row gt_right">2023-03-24</td>
-<td headers="season" class="gt_row gt_right">2023</td>
-<td headers="team_rolling_def" class="gt_row gt_right">93.40313</td>
-<td headers="team_rolling_offmean" class="gt_row gt_right">102.4814</td>
-<td headers="team_cumulative_def" class="gt_row gt_right">91.68726</td>
-<td headers="team_rolling_pos" class="gt_row gt_right">69.58361</td></tr>
+    <tr><td headers=".pred_class" class="gt_row gt_center gt_striped">W</td>
+<td headers=".pred_W" class="gt_row gt_right gt_striped">0.7215527</td>
+<td headers=".pred_L" class="gt_row gt_right gt_striped">0.2784473</td>
+<td headers="team_short_display_name" class="gt_row gt_left gt_striped">Alabama</td>
+<td headers="opponent_short_display_name" class="gt_row gt_left gt_striped">Texas A&amp;M-CC</td>
+<td headers="opponent_rolling_def" class="gt_row gt_right gt_striped">103.42589</td>
+<td headers="opponent_rolling_offmean" class="gt_row gt_right gt_striped">102.4858</td>
+<td headers="opponent_cumulative_def" class="gt_row gt_right gt_striped">101.45245</td>
+<td headers="opponent_rolling_pos" class="gt_row gt_right gt_striped">69.57647</td>
+<td headers="game_id" class="gt_row gt_right gt_striped">401522197</td>
+<td headers="game_date" class="gt_row gt_right gt_striped">2023-03-24</td>
+<td headers="season" class="gt_row gt_right gt_striped">2023</td>
+<td headers="team_rolling_def" class="gt_row gt_right gt_striped">93.40313</td>
+<td headers="team_rolling_offmean" class="gt_row gt_right gt_striped">102.4814</td>
+<td headers="team_cumulative_def" class="gt_row gt_right gt_striped">91.68726</td>
+<td headers="team_rolling_pos" class="gt_row gt_right gt_striped">69.58361</td></tr>
     <tr><td headers=".pred_class" class="gt_row gt_center">L</td>
 <td headers=".pred_W" class="gt_row gt_right">0.3699807</td>
 <td headers=".pred_L" class="gt_row gt_right">0.6300193</td>
@@ -1748,22 +1770,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td headers="team_rolling_offmean" class="gt_row gt_right">102.4839</td>
 <td headers="team_cumulative_def" class="gt_row gt_right">105.68686</td>
 <td headers="team_rolling_pos" class="gt_row gt_right">69.57991</td></tr>
-    <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
-<td headers=".pred_W" class="gt_row gt_right">0.5952709</td>
-<td headers=".pred_L" class="gt_row gt_right">0.4047291</td>
-<td headers="team_short_display_name" class="gt_row gt_left">Maryland</td>
-<td headers="opponent_short_display_name" class="gt_row gt_left">West Virginia</td>
-<td headers="opponent_rolling_def" class="gt_row gt_right">106.26248</td>
-<td headers="opponent_rolling_offmean" class="gt_row gt_right">102.4889</td>
-<td headers="opponent_cumulative_def" class="gt_row gt_right">101.85069</td>
-<td headers="opponent_rolling_pos" class="gt_row gt_right">69.57440</td>
-<td headers="game_id" class="gt_row gt_right">401522159</td>
-<td headers="game_date" class="gt_row gt_right">2023-03-18</td>
-<td headers="season" class="gt_row gt_right">2023</td>
-<td headers="team_rolling_def" class="gt_row gt_right">101.31957</td>
-<td headers="team_rolling_offmean" class="gt_row gt_right">102.4835</td>
-<td headers="team_cumulative_def" class="gt_row gt_right">98.28184</td>
-<td headers="team_rolling_pos" class="gt_row gt_right">69.58000</td></tr>
+    <tr><td headers=".pred_class" class="gt_row gt_center gt_striped">W</td>
+<td headers=".pred_W" class="gt_row gt_right gt_striped">0.5952709</td>
+<td headers=".pred_L" class="gt_row gt_right gt_striped">0.4047291</td>
+<td headers="team_short_display_name" class="gt_row gt_left gt_striped">Maryland</td>
+<td headers="opponent_short_display_name" class="gt_row gt_left gt_striped">West Virginia</td>
+<td headers="opponent_rolling_def" class="gt_row gt_right gt_striped">106.26248</td>
+<td headers="opponent_rolling_offmean" class="gt_row gt_right gt_striped">102.4889</td>
+<td headers="opponent_cumulative_def" class="gt_row gt_right gt_striped">101.85069</td>
+<td headers="opponent_rolling_pos" class="gt_row gt_right gt_striped">69.57440</td>
+<td headers="game_id" class="gt_row gt_right gt_striped">401522159</td>
+<td headers="game_date" class="gt_row gt_right gt_striped">2023-03-18</td>
+<td headers="season" class="gt_row gt_right gt_striped">2023</td>
+<td headers="team_rolling_def" class="gt_row gt_right gt_striped">101.31957</td>
+<td headers="team_rolling_offmean" class="gt_row gt_right gt_striped">102.4835</td>
+<td headers="team_cumulative_def" class="gt_row gt_right gt_striped">98.28184</td>
+<td headers="team_rolling_pos" class="gt_row gt_right gt_striped">69.58000</td></tr>
     <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
 <td headers=".pred_W" class="gt_row gt_right">0.6392229</td>
 <td headers=".pred_L" class="gt_row gt_right">0.3607771</td>
@@ -1780,22 +1802,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td headers="team_rolling_offmean" class="gt_row gt_right">102.4817</td>
 <td headers="team_cumulative_def" class="gt_row gt_right">97.72871</td>
 <td headers="team_rolling_pos" class="gt_row gt_right">69.58448</td></tr>
-    <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
-<td headers=".pred_W" class="gt_row gt_right">0.5487660</td>
-<td headers=".pred_L" class="gt_row gt_right">0.4512340</td>
-<td headers="team_short_display_name" class="gt_row gt_left">Baylor</td>
-<td headers="opponent_short_display_name" class="gt_row gt_left">UCSB</td>
-<td headers="opponent_rolling_def" class="gt_row gt_right">109.68198</td>
-<td headers="opponent_rolling_offmean" class="gt_row gt_right">102.4832</td>
-<td headers="opponent_cumulative_def" class="gt_row gt_right">100.31167</td>
-<td headers="opponent_rolling_pos" class="gt_row gt_right">69.57930</td>
-<td headers="game_id" class="gt_row gt_right">401522179</td>
-<td headers="game_date" class="gt_row gt_right">2023-03-19</td>
-<td headers="season" class="gt_row gt_right">2023</td>
-<td headers="team_rolling_def" class="gt_row gt_right">109.07191</td>
-<td headers="team_rolling_offmean" class="gt_row gt_right">102.4889</td>
-<td headers="team_cumulative_def" class="gt_row gt_right">104.07723</td>
-<td headers="team_rolling_pos" class="gt_row gt_right">69.57643</td></tr>
+    <tr><td headers=".pred_class" class="gt_row gt_center gt_striped">W</td>
+<td headers=".pred_W" class="gt_row gt_right gt_striped">0.5487660</td>
+<td headers=".pred_L" class="gt_row gt_right gt_striped">0.4512340</td>
+<td headers="team_short_display_name" class="gt_row gt_left gt_striped">Baylor</td>
+<td headers="opponent_short_display_name" class="gt_row gt_left gt_striped">UCSB</td>
+<td headers="opponent_rolling_def" class="gt_row gt_right gt_striped">109.68198</td>
+<td headers="opponent_rolling_offmean" class="gt_row gt_right gt_striped">102.4832</td>
+<td headers="opponent_cumulative_def" class="gt_row gt_right gt_striped">100.31167</td>
+<td headers="opponent_rolling_pos" class="gt_row gt_right gt_striped">69.57930</td>
+<td headers="game_id" class="gt_row gt_right gt_striped">401522179</td>
+<td headers="game_date" class="gt_row gt_right gt_striped">2023-03-19</td>
+<td headers="season" class="gt_row gt_right gt_striped">2023</td>
+<td headers="team_rolling_def" class="gt_row gt_right gt_striped">109.07191</td>
+<td headers="team_rolling_offmean" class="gt_row gt_right gt_striped">102.4889</td>
+<td headers="team_cumulative_def" class="gt_row gt_right gt_striped">104.07723</td>
+<td headers="team_rolling_pos" class="gt_row gt_right gt_striped">69.57643</td></tr>
     <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
 <td headers=".pred_W" class="gt_row gt_right">0.6092526</td>
 <td headers=".pred_L" class="gt_row gt_right">0.3907474</td>
@@ -1812,73 +1834,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td headers="team_rolling_offmean" class="gt_row gt_right">102.4837</td>
 <td headers="team_cumulative_def" class="gt_row gt_right">96.42041</td>
 <td headers="team_rolling_pos" class="gt_row gt_right">69.57858</td></tr>
-    <tr><td headers=".pred_class" class="gt_row gt_center">W</td>
-<td headers=".pred_W" class="gt_row gt_right">0.6108574</td>
-<td headers=".pred_L" class="gt_row gt_right">0.3891426</td>
-<td headers="team_short_display_name" class="gt_row gt_left">Arizona</td>
-<td headers="opponent_short_display_name" class="gt_row gt_left">Princeton</td>
-<td headers="opponent_rolling_def" class="gt_row gt_right">103.83938</td>
-<td headers="opponent_rolling_offmean" class="gt_row gt_right">102.4816</td>
-<td headers="opponent_cumulative_def" class="gt_row gt_right">98.46669</td>
-<td headers="opponent_rolling_pos" class="gt_row gt_right">69.58340</td>
-<td headers="game_id" class="gt_row gt_right">401522134</td>
-<td headers="game_date" class="gt_row gt_right">2023-03-16</td>
-<td headers="season" class="gt_row gt_right">2023</td>
-<td headers="team_rolling_def" class="gt_row gt_right">98.06557</td>
-<td headers="team_rolling_offmean" class="gt_row gt_right">102.4831</td>
-<td headers="team_cumulative_def" class="gt_row gt_right">97.51326</td>
-<td headers="team_rolling_pos" class="gt_row gt_right">69.57926</td></tr>
+    <tr><td headers=".pred_class" class="gt_row gt_center gt_striped">W</td>
+<td headers=".pred_W" class="gt_row gt_right gt_striped">0.6108574</td>
+<td headers=".pred_L" class="gt_row gt_right gt_striped">0.3891426</td>
+<td headers="team_short_display_name" class="gt_row gt_left gt_striped">Arizona</td>
+<td headers="opponent_short_display_name" class="gt_row gt_left gt_striped">Princeton</td>
+<td headers="opponent_rolling_def" class="gt_row gt_right gt_striped">103.83938</td>
+<td headers="opponent_rolling_offmean" class="gt_row gt_right gt_striped">102.4816</td>
+<td headers="opponent_cumulative_def" class="gt_row gt_right gt_striped">98.46669</td>
+<td headers="opponent_rolling_pos" class="gt_row gt_right gt_striped">69.58340</td>
+<td headers="game_id" class="gt_row gt_right gt_striped">401522134</td>
+<td headers="game_date" class="gt_row gt_right gt_striped">2023-03-16</td>
+<td headers="season" class="gt_row gt_right gt_striped">2023</td>
+<td headers="team_rolling_def" class="gt_row gt_right gt_striped">98.06557</td>
+<td headers="team_rolling_offmean" class="gt_row gt_right gt_striped">102.4831</td>
+<td headers="team_cumulative_def" class="gt_row gt_right gt_striped">97.51326</td>
+<td headers="team_rolling_pos" class="gt_row gt_right gt_striped">69.57926</td></tr>
   </tbody>
-  
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="16"><strong>By:</strong> Molly Robinson  |  <strong>Source:</strong> <a href="https://hoopr.sportsdataverse.org/reference/index.html">hoopr</a></td>
+    </tr>
+  </tfoot>
   
 </table>
 </div>
 </div>
 </div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> southround1games, <span class="fu">aes</span>(<span class="at">x =</span> team_rolling_offmean, <span class="at">y =</span> opponent_rolling_offmean, <span class="at">color =</span> team_short_display_name)) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">1</span>, <span class="at">shape=</span><span class="dv">10</span>, <span class="at">stroke=</span><span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Cumulative Mean Score for the South"</span>, <span class="at">x =</span> <span class="st">"Team Cumulative Mean"</span>, <span class="at">y =</span> <span class="st">"Opponent Cumulative Mean"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing missing values (`geom_line()`).</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_line()`: Each group consists of only one observation.
-ℹ Do you need to adjust the group aesthetic?</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> southround2games, <span class="fu">aes</span>(<span class="at">x =</span> team_rolling_offmean, <span class="at">y =</span> opponent_rolling_offmean, <span class="at">color =</span> team_short_display_name)) <span class="sc">+</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">1</span>, <span class="at">shape=</span><span class="dv">10</span>, <span class="at">stroke=</span><span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Cumulative Mean Score for the South"</span>, <span class="at">x =</span> <span class="st">"Team Cumulative Mean"</span>, <span class="at">y =</span> <span class="st">"Opponent Cumulative Mean"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing missing values (`geom_line()`).</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_line()`: Each group consists of only one observation.
-ℹ Do you need to adjust the group aesthetic?</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
+<p>Arizona beating Princeton? Reasonable pick, until the Wildcats were shocked. My biggest miss was picking Virginia over Furman. This also seems like a reasonable pick given the Cavalier’s successes over the years. But alas, it is March after all.</p>
 <p>Alabama winning the entire south didn’t particularity seem too far fetched, until San Diego State came along in the actual tournament…</p>
 <p><img src="images/east.png" class="img-fluid"></p>
 <p><img src="images/midwest.png" class="img-fluid"></p>
